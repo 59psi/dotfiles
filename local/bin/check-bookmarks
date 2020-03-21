@@ -1,0 +1,59 @@
+#!/usr/bin/env ruby -w
+
+require "nokogiri"
+require "net/https"
+
+STDOUT.sync = !$stdout.tty?
+
+BOOKMARKS_PATH = File.expand_path("~/Library/Safari/Bookmarks.plist")
+TIMEOUT = 5
+HEADERS = {
+  'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/12.0 Safari/605.1.15',
+  'Accept-Encoding' => 'br, gzip, deflate'
+}.freeze
+
+def check_url(url, method: Net::HTTP::Head, &block)
+  uri = URI(url)
+
+  opts = {
+    open_timeout: TIMEOUT,
+    read_timeout: TIMEOUT,
+    use_ssl:      uri.scheme == "https",
+  }
+
+  Net::HTTP.start(uri.host, uri.port, opts) do |http|
+    case resp = http.request(method.new(uri, HEADERS))
+    when Net::HTTPRedirection
+      check_redirect(uri, resp, &block)
+    when Net::HTTPNotFound, Net::HTTPMethodNotAllowed
+      if method == Net::HTTP::Head
+        check_url(uri, method: Net::HTTP::Get, &block)
+      else
+        yield "#{resp.code}: #{uri}"
+      end
+    else
+      yield "#{resp.code}: #{uri}"
+    end
+  end
+rescue Net::OpenTimeout, Net::ReadTimeout
+  yield "TIMEOUT: #{uri}"
+rescue StandardError => e
+  yield "ERROR: #{uri}\n  #{e.message}"
+end
+
+def check_redirect(uri, resp, &block)
+  loc = resp.fetch("location")
+  new_uri = URI.join(uri, loc)
+  if new_uri == uri
+    yield "ERROR: #{uri}\n Skipping self-redirect"
+  else
+    yield "#{resp.code}: #{uri} -> #{loc}"
+    check_url(new_uri, &block)
+  end
+end
+
+IO.popen(%W[plutil -convert xml1 -o - #{BOOKMARKS_PATH}]) do |io|
+  Nokogiri::XML(io).xpath("//key[.=\"URLString\"]/../string[contains(text(),'http')]/text()").each do |url|
+    check_url(url) { |result| puts result }
+  end
+end

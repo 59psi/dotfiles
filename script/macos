@@ -1,0 +1,166 @@
+#!/usr/bin/env bash
+
+set -eu
+sudo -K
+
+# System
+
+## Expand save panels
+defaults write -g NSNavPanelExpandedStateForSaveMode -bool true
+defaults write -g NSNavPanelExpandedStateForSaveMode2 -bool true
+
+## Save new documents to local disk
+defaults write -g NSDocumentSaveNewDocumentsToCloud -bool false
+
+# App Store
+
+## Automatically check for updates
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticCheckEnabled -bool true
+
+## Download newly available updates in the background
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate AutomaticDownload -bool true
+
+## Install app updates
+sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdate -bool true
+
+## Install macOS updates
+sudo defaults write /Library/Preferences/com.apple.commerce AutoUpdateRestartRequired -bool true
+
+## Install system data files and security updates
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate ConfigDataInstall -bool true
+sudo defaults write /Library/Preferences/com.apple.SoftwareUpdate CriticalUpdateInstall -bool true
+
+# Archive Utility
+
+## After expanding: move archive into Trash
+# shellcheck disable=2088
+defaults write com.apple.archiveutility dearchive-move-after -string '~/.Trash'
+
+# Dock
+
+## Size
+defaults write com.apple.dock tilesize -int 32
+
+## Magnification
+defaults write com.apple.dock magnification -bool false
+
+## Position on screen
+defaults write com.apple.dock orientation -string left
+
+## Minimize windows using
+defaults write com.apple.dock mineffect -string scale
+
+## Prefer tabs when opening documents
+defaults write -g AppleWindowTabbingMode -string fullscreen
+
+## Double click a window's title bar to zoom
+defaults write -g AppleActionOnDoubleClick -string Maximize
+
+## Minimize windows into application icon
+defaults write com.apple.dock minimize-to-application -bool false
+
+## Animate opening applications
+defaults write com.apple.dock launchanim -bool true
+
+## Automatically hide and show the dock
+defaults write com.apple.dock autohide -bool false
+
+## Show indicators for open applications
+defaults write com.apple.dock show-process-indicators -bool true
+
+# Finder
+
+## Show Library folder
+chflags nohidden ~/Library
+
+## Show Volumes folder
+sudo chflags nohidden /Volumes
+
+## Show these items on the desktop
+defaults write com.apple.finder ShowExternalHardDrivesOnDesktop -bool true
+defaults write com.apple.finder ShowHardDrivesOnDesktop -bool false
+defaults write com.apple.finder ShowMountedServersOnDesktop -bool false
+defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
+
+## New Finder windows show home folder
+defaults write com.apple.finder NewWindowTarget -string PfHm
+defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}/"
+
+## Open folders in tabs intead of windows
+defaults write com.apple.finder FinderSpawnTab -bool true
+
+## Show all filename extensions
+defaults write -g AppleShowAllExtensions -bool false
+
+## Show warning before changing an extension
+defaults write com.apple.finder FXEnableExtensionChangeWarning -bool true
+
+## Show warning before removing from iCloud Drive
+defaults write com.apple.finder FXEnableRemoveFromICloudDriveWarning -bool true
+
+## Show warning before emptying the Trash
+defaults write com.apple.finder WarnOnEmptyTrash -bool true
+
+## Remove items from the Trash after 30 days
+defaults write com.apple.finder FXRemoveOldTrashItems -bool true
+
+## Keep folders on top when sorting by name
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
+## When performing a search, search the current folder
+defaults write com.apple.finder FXDefaultSearchScope -string SCcf
+
+## View options
+defaults write com.apple.finder ShowTabView -bool false
+
+## Show Status Bar
+defaults write com.apple.finder ShowStatusBar -bool true
+
+## Show Path Bar
+defaults write com.apple.finder ShowPathbar -bool true
+
+## Open windows in list view
+defaults write com.apple.finder FXPreferredViewStyle -string Nlsv
+defaults write com.apple.finder FXPreferredSearchViewStyle -string Nlsv
+
+# Keyboard
+
+## Full Keyboard Access: In windows and dialogs, press Tab to move keyboard focus between: All controls
+defaults write -g AppleKeyboardUIMode -int 3
+
+# Mission Control
+
+## Automatically rearrange Spaces based on most recent use
+defaults write com.apple.dock mru-spaces -bool true
+
+## When switching to an application, switch to a Space with open windows for the application
+defaults write -g AppleSpacesSwitchOnActivate -bool true
+
+# Group windows by application
+defaults write com.apple.dock expose-group-by-app -bool false
+
+## Displays have separate Spaces
+defaults write com.apple.spaces spans-displays -bool false
+
+## Hot corners
+defaults write com.apple.dock wvous-bl-corner   -int 10 # Put display to sleep
+defaults write com.apple.dock wvous-bl-modifier -int 0
+defaults write com.apple.dock wvous-br-corner   -int 10 # Put display to sleep
+defaults write com.apple.dock wvous-br-modifier -int 0
+defaults write com.apple.dock wvous-tl-corner   -int 11 # Launchpad
+defaults write com.apple.dock wvous-tl-modifier -int 0
+defaults write com.apple.dock wvous-tr-corner   -int 2 # Mission Control
+defaults write com.apple.dock wvous-tr-modifier -int 0
+
+# Safari
+
+## Enable debug menu
+defaults write com.apple.Safari IncludeInternalDebugMenu -bool true
+
+# TweetBot
+
+## Bypass "t.co" links
+defaults write com.tapbots.Tweetbot3Mac OpenURLsDirectly -bool true
+
+# Reboot, allow cancellation
+osascript -e 'tell app "loginwindow" to «event aevtrrst»'

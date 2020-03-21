@@ -1,0 +1,125 @@
+# vim:ft=gitconfig
+
+[alias]
+	afx = autofixup
+	ap = add --patch
+	au = add --update
+	br = branch -vv
+	ca = commit --amend --reuse-message=HEAD
+	ci = commit
+	co = checkout
+	cp = cherry-pick
+	dc = diff --cached
+	dh = diff HEAD
+	di = diff
+	du = diff @{u}
+	ff = merge --ff-only
+	fx = commit --fixup
+	jd = jump diff
+	jg = jump grep
+	jm = jump merge
+	lg = log --graph --decorate --oneline
+	ls = ls-files -oc --exclude-standard
+	st = status --short --branch -uno
+	rba = rebase --abort
+	rbc = rebase --continue
+	rbi = rebase --interactive
+	rbs = rebase --skip
+	thx = shortlog -ns
+[branch]
+	autoSetupMerge = always
+	autoSetupRebase = always
+[color]
+	ui = auto
+[color "grep"]
+	filename = magenta
+	linenumber = green
+	match = bold red
+	separator = cyan
+[commit]
+	verbose = true
+[core]
+	pager = less -S ; -S - don't wrap long lines
+[credential]
+	helper = osxkeychain
+[diff]
+	renames = copies
+	tool = vimdiff
+	algorithm = patience
+[diff "gpg"]
+	textconv = gpg -qd --no-tty
+[diff "gzip"]
+	textconv = gzip -d -c
+[diff "keybox"]
+	textconv = kbxutil
+	xfuncname = "^((Uid|Key-Kid)\\[.*)"
+[diff "keyring"]
+	textconv = gpg -v
+	xfuncname = "^((pub|uid) .*)"
+[diff "plist"]
+	textconv = plutil -convert xml1 -o -
+[diff "sqlite"]
+	textconv = sh -c 'exec sqlite3 "$@" .dump' -
+[diff "tar"]
+	textconv = tar -tvf
+[difftool]
+	prompt = false
+[fetch]
+	prune = true
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[grep]
+	extendedRegexp = true
+	lineNumber = true
+[help]
+	format = web
+[init]
+	; templatedir = ~/.config/git/template
+[instaweb]
+	httpd = webrick
+	local = true
+	port = 8080
+[interactive]
+	singleKey = true
+	diffFilter = diff-highlight
+[log]
+	decorate = short
+[merge]
+	conflictStyle = diff3
+[merge "bundle"]
+	name = bundle
+	driver = bundle
+[merge "npm-merge-driver"]
+	name = automatically merge npm lockfiles
+	driver = npx npm-merge-driver merge %A %O %B %P
+[pager]
+	; +X - don't clear the screen on exit
+	; -S - don't wrap long lines
+	log = diff-highlight | less -S -+X
+	show = diff-highlight | less -S
+	diff = diff-highlight | less -S
+[pull]
+	rebase = merges
+[push]
+	default = simple
+[rebase]
+	autoSquash = true
+	autoStash = true
+[remote]
+	pushDefault = origin
+[rerere]
+	enabled = true
+	autoUpdate = true
+[stash]
+	showPatch = true
+[submodule]
+	fetchJobs = 0
+[transfer]
+	fsckObjects = true
+[user]
+	useConfigOnly = true
+[web]
+	browser = open

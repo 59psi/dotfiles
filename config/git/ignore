@@ -1,0 +1,14 @@
+*.bak
+*.orig
+*.rej
+*~
+.DS_Store
+.vscode
+Session.vim
+Sessionx.vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+[._]*.un~
+tags

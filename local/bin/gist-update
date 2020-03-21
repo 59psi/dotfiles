@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+set -eu
+
+gist_dir="$HOME/git/gists"
+host=git@gist.github.com
+
+have () {
+  find "$gist_dir" -mindepth 1 -maxdepth 1 -exec basename {} \; | sort
+}
+
+want () {
+  gist --list | cut -d' ' -f1 | while read -r url; do
+    echo "${url#https://gist.github.com/}"
+  done | sort
+}
+
+mkdir -p "$gist_dir"
+[ -f "$HOME/.gist" ] || gist --login
+
+comm -23 <(have) <(want) | xargs -n1 -P8 -I{} rm -rf "$gist_dir/{}"
+comm -13 <(have) <(want) | xargs -n1 -P8 -I{} git clone -q "$host:{}.git"  "$gist_dir/{}"
+comm -12 <(have) <(want) | xargs -n1 -P8 -I{} git -C "$gist_dir/{}" pull -q

@@ -1,339 +1,251 @@
-" vim:set sts=2 sw=2 et:
+scriptencoding utf-8
 
-runtime bundle/pathogen/autoload/pathogen.vim
-call pathogen#infect()
-
-filetype plugin indent on
-
-runtime macros/matchit.vim
+packadd! matchit
 
 set nocompatible
-set encoding=utf-8
-set history=1000
-set viminfo='50,h,n~/.vim/viminfo
-
-if has("persistent_undo")
-  set undodir^=$HOME/.vim/_undo
-  set undofile
-endif
-
-set nobackup
-set writebackup
-set backupdir^=$HOME/.vim/_backup//
-set backupcopy=yes
-set backupskip+=/private/tmp/*
-set directory^=$HOME/.vim/_swap//
-set autowrite
+set autoindent
 set autoread
-
-set switchbuf=useopen
-set hidden
-
-set background=dark
-colorscheme solarized
-syntax enable
-
+set autowrite
+set backspace=indent,eol,start
+set backupdir^=~/.vim/_backup//
+set backupskip&
+set backupskip+=/private/tmp/*
+set belloff=all
+set cmdheight=2
+set complete-=i
+set completeopt=menuone,longest,preview
+set cursorline
+set dictionary+=/usr/share/dict/words
+set directory^=~/.vim/_swap//
+set display=lastline
+set fillchars=vert:│,fold:·
+set formatoptions+=1rj
+set history=200
+set hlsearch
+set incsearch
+set laststatus=2
+set lazyredraw
+set listchars=tab:▸\ ,trail:·,extends:…,precedes:…,nbsp:␠
+set noequalalways
+set nojoinspaces
+set nolangremap
+set nrformats-=octal
 set number
 set numberwidth=3
-set scrolloff=3
-set backspace=indent,eol,start
-set cmdheight=2
-set showcmd
-set visualbell
 set report=0
-set laststatus=2
-set showtabline=2
-set cursorline
-set shortmess=aIoOtT
-set lazyredraw
-set virtualedit=block
-set nojoinspaces
-
-set ignorecase
-set smartcase
-set incsearch
-set hlsearch
-
-set wildmode=longest:full,full
-set wildmenu
-
-set autoindent
-set expandtab
+set scrolloff=5
+set sessionoptions-=options
+set shiftround
+set shortmess=aFIoOtT
+set showcmd
+set sidescroll=1
+set sidescrolloff=5
 set smarttab
-
-set completeopt=menuone,longest,preview
-set complete-=i
-set formatoptions+=r
-set listchars=tab:▸\ ,eol:¬
-
-set statusline=%<                   " truncation point
-set statusline+=[%n]                " buffer number
-set statusline+=\ %.99f             " relative path to file
-set statusline+=%{FugitiveStatuslineWrapper()}
-set statusline+=\ %h%w%m%r%y        " help|preview|modified|readonly|filetype
-set statusline+=%=                  " l-r separator
-set statusline+=%-14(%3l,%02c%03V%) " line#,col#-vcol#
-
-set timeout
-set ttimeout
+set spellfile=~/.vim/spell/en.utf-8.add,~/.vim/spell/en-local.utf-8.add
+set spelllang=en_us
+set splitbelow
+set splitright
+set switchbuf=useopen
+set tags+=./tags;
+set thesaurus+=~/.vim/spell/mthesaur.txt
 set timeoutlen=1200
-set ttimeoutlen=10
+set title
+set ttimeout
+set ttimeoutlen=50
+set undodir^=~/.vim/_undo
+set undofile
+set viminfo+=n~/.vim/viminfo
+set viminfo^=!
+set virtualedit+=block
+set wildignore+=*.[aos],*.aux,*.class,*.dSYM,*.dylib,*.out,*.py[co],*.so,.DS_Store
+set wildignore+=*~,Session.vim,Sessionx.vim,[._]*.s[a-v][a-z],[._]*.sw[a-p],[._]s[a-v][a-z],[._]sw[a-p],[._]*.un~,tags
+set wildmenu
+set wildmode=longest:full,full
+set winheight=10
+set winminheight=10
+set winwidth=80
 
-set wildignore+=*.aux,*.out
-set wildignore+=*.sw?
-set wildignore+=.DS_Store
-set wildignore+=*.[oa],*.so,*.dylib
-set wildignore+=*/_undo/*
+set statusline=[%n]                 " buffer number
+set statusline+=%(\ %.120f\ %)      " relative path to file
+set statusline+=%h%w%m%r%y          " help|preview|modified|readonly|filetype
+set statusline+=%{FugitiveStatusline()}
+set statusline+=%=                  " l-r separator
+set statusline+=%-10.(0x%B%)        " hex value of character under cursor
+set statusline+=%-15.(%l,%c%V%)\ %P " line#,col#-vcol# %
+
+filetype plugin indent on
+syntax enable
+
+if $COLORTERM ==# 'truecolor'
+  if has('termguicolors')
+    set termguicolors
+  endif
+
+  silent! colorscheme deep-space
+endif
+
+if executable('rg')
+  set grepprg=rg\ --vimgrep
+  set grepformat^=%f:%l:%c:%m
+elseif executable('ggrep')
+  set grepprg=ggrep\ -rnHI\ --exclude-dir=.git\ --exclude=tags
+else
+  set grepprg=grep\ -rnHI\ --exclude-dir=.git\ --exclude=tags
+endif
 
 " plugin settings
-let g:vitality_fix_cursor = 0
-let g:CommandTMaxHeight = 10
+let g:ale_lint_on_insert_leave = 1
+let g:ale_lint_on_text_changed = 'never'
+let g:ale_pattern_options = {
+  \ '/node_modules/': { 'ale_enabled': 0 },
+  \}
+let g:jsx_ext_required = 1
+let g:markdown_fenced_languages = [
+  \ 'bash=sh',
+  \ 'css',
+  \ 'go',
+  \ 'html',
+  \ 'java',
+  \ 'javascript',
+  \ 'js=javascript',
+  \ 'json',
+  \ 'python',
+  \ 'ruby',
+  \ 'shell=sh',
+  \ 'sql',
+  \ 'swift',
+  \ 'terraform',
+  \ 'yaml',
+  \]
+let g:no_default_tabular_maps = 1
+let g:terraform_fmt_on_save = 1
+let g:vim_indent_cont = 2
+let g:vim_json_syntax_conceal = 0
 
 " mappings
-let mapleader = ","
+let g:mapleader = ','
 
-map <left> <nop>
-map <right> <nop>
-map <up> <nop>
-map <down> <nop>
-imap <left> <nop>
-imap <right> <nop>
-imap <up> <nop>
-imap <down> <nop>
+map  <Left>  <Nop>
+map  <Right> <Nop>
+map  <Up>    <Nop>
+map  <Down>  <Nop>
+imap <Left>  <Nop>
+imap <Right> <Nop>
+imap <Up>    <Nop>
+imap <Down>  <Nop>
 
-nnoremap <c-j> <c-w>j
-nnoremap <c-k> <c-w>k
-nnoremap <c-h> <c-w>h
-nnoremap <c-l> <c-w>l
+" make Q work like gq instead of switching
+map Q gq
 
-" switch to previous file
-nnoremap <leader><leader> <c-^>
+" make Y work like y$ instead of yy
+nmap Y y$
 
-nnoremap <silent> <leader>b :CommandTBuffer<cr>
-nnoremap <silent> <leader>f :CommandT<cr>
+" In insert mode, break the current undo sequence in sensible places. If <CR>
+" is already mapped to include <C-G>u, then don't remap it. This preserves the
+" endwise.vim <CR> mapping when re-sourcing this file.
+if maparg('<CR>', 'i') !~# '<C-G>u<CR>'
+  inoremap <CR> <C-G>u<CR>
+endif
+inoremap <C-U> <C-G>u<C-U>
+inoremap <C-W> <C-G>u<C-W>
 
-" :bc to write and delete buffer
-cnoreabbrev bc w<bar>bd
+" make & include flags
+nnoremap & :&&<CR>
+xnoremap & :&&<CR>
 
-cnoremap <expr> %% getcmdtype() == ":" ? expand("%:h")."/" : "%%"
-nmap <leader>e :edit %%
-nmap <leader>v :view %%
-
-" quickfix navigation
-nnoremap <silent> ]q :<C-U>exe "cnext".v:count1<cr>
-nnoremap <silent> [q :<C-U>exe "cprev".v:count1<cr>
-
-inoremap <c-c> <esc>
-inoremap <c-l> <space>=><space>
-
-nnoremap <leader>l :set list!<cr>
-
-" find merge conflict markers
-nnoremap <leader>cf /\v^[<=\|>]{7}\s.*$<cr>
+" make Ctrl-C check abbreviations and trigger InsertLeave
+inoremap <C-C> <Esc>
 
 " continuous indentation
 vnoremap > >gv
 vnoremap < <gv
 
-function! FugitiveStatuslineWrapper()
-  let head = fugitive#head(7)
-  if head != ""
-    return " [".head."]"
+" clear search highlighting
+nnoremap <silent> <C-L> :nohlsearch<CR><C-L>
+
+function! s:sort_opfunc(...)
+  '[,']sort
+endfunction
+nnoremap <silent> gs :set operatorfunc=<SID>sort_opfunc<CR>g@
+vnoremap <silent> gs :sort<CR>
+
+noremap gy "*y
+
+nnoremap [q :cprev<CR>
+nnoremap ]q :cnext<CR>
+nnoremap yol :setlocal invlist<CR>
+nnoremap yow :setlocal invwrap<CR>
+
+function! s:restore_last_cursor_position()
+  " If the last cursor position is on the first line or past the end of the
+  " file, don't do anything.
+  if line("'\"") == 0 || line("'\"") > line("$")
+    return
+  endif
+
+  " Jump to the last cursor position. If it is not in the bottom half of the
+  " last window, then re-center the window on the line.
+  if line("$") - line("'\"") > (line("w$") - line("w0")) / 2
+    execute "normal! g`\"zz"
   else
-    return ""
+    execute "normal! g`\""
   endif
 endfunction
 
 augroup filetypes
   autocmd!
-  autocmd FileType c                      setlocal ai noet sta cin
-  autocmd FileType make                   setlocal ai noet sta
-  autocmd FileType gitconfig              setlocal ai noet sta
-  autocmd FileType sql                    setlocal ai et sta sw=2 sts=2
-  autocmd FileType ruby,cucumber,yaml     setlocal ai et sta sw=2 sts=2
-  autocmd FileType css,scss,sass          setlocal ai et sta sw=2 sts=2
-  autocmd FileType javascript             setlocal ai et sta sw=2 sts=2 cin
-  autocmd FileType eruby,haml,html        setlocal ai et sta sw=2 sts=2
-  autocmd FileType vim                    setlocal ai et sta sw=2 sts=2 kp=:help
-  autocmd FileType sh                     setlocal ai et sta sw=4 sts=4
-  autocmd FileType python                 setlocal ai et sta sw=4 sts=4
-  autocmd FileType eruby,html
-    \ if g:html_indent_tags !~# '\v\|p>' |
-    \   let g:html_indent_tags .= '\|p\|li\|dt\|dd\|nav\|header\|footer' |
-    \ endif
-  autocmd FileType help nnoremap <silent> <buffer> q :q<cr>
-augroup END
-
-augroup completion
-  autocmd FileType *
-    \ if &omnifunc == "" |
-    \   setlocal omnifunc=syntaxcomplete#Complete |
-    \ endif
-  autocmd FileType *
-    \ if &completefunc == "" |
-    \   setlocal completefunc=syntaxcomplete#Complete |
-    \ endif
-augroup END
-
-augroup compilers
-  autocmd!
-  autocmd FileType cucumber             silent! compiler cucumber
-  autocmd FileType sass,scss            silent! compiler sass
-  autocmd FileType haml                 silent! compiler haml
-  autocmd BufNewFile,BufRead *_spec.rb  silent! compiler rspec
-  autocmd BufNewFile,BufRead *_test.rb  silent! compiler rubyunit
-  autocmd BufNewFile,BufRead test_*.rb
-    \ silent! compiler rubyunit |
-    \ setlocal makeprg=/usr/bin/testrb
-  autocmd User Bundler
-    \ if &makeprg !~# '^bundle' |
-    \   setlocal makeprg^=bundle\ exec\  |
-    \ endif
+  autocmd BufNewFile,BufReadPost *.log{,.[0-9]*} setlocal readonly bufhidden=unload buftype=nowrite noundofile nowrap
+  autocmd BufNewFile,BufReadPost */node_modules/* setlocal readonly
+  autocmd BufNewFile,BufReadPost .npmignore setlocal ft=conf
+  autocmd BufNewFile,BufReadPost .npmrc setlocal ft=dosini
 augroup END
 
 augroup vimrc
   autocmd!
-  autocmd BufWritePost *vimrc source $MYVIMRC
+  autocmd BufWritePost {,.}vimrc source <afile>
+  autocmd BufWritePost */spell/*.add silent! mkspell! <afile>
 augroup END
 
 augroup lastposjump
   autocmd!
-  autocmd BufReadPost *
-    \ if line("'\"") > 0 && line("'\"") <= line("$") |
-    \   execute "normal g`\"zvzz" |
-    \ endif
+  autocmd BufReadPost *.log{,.[0-9]*} delmarks \"
+  autocmd BufReadPost quickfix delmarks \"
+  autocmd BufReadPost * call s:restore_last_cursor_position()
+augroup END
+
+augroup undo
+  autocmd!
+  autocmd CursorHoldI * silent! call feedkeys("\<C-G>u", "nt")
+  autocmd BufWritePre /tmp/*,$TMPDIR/*,/{private,var,private/var}/tmp/*,/{var,private/var}/folders/* setlocal noundofile
 augroup END
 
 augroup focus
   autocmd!
   autocmd FocusLost * silent! wall
-  autocmd FocusGained * silent! call fugitive#reload_status()
 augroup END
 
 augroup swapmod
   autocmd!
-  autocmd CursorHold,CursorHoldI,CursorMoved,CursorMovedI,BufWritePost,BufReadPost,BufLeave *
-    \ if !empty(map(split(&directory, ","), "isdirectory(expand(v:val))")) |
+  autocmd CursorHold,CursorHoldI,BufWritePost,BufReadPost,BufLeave *
+    \ if !empty(filter(split(&directory, ","), "isdirectory(expand(v:val))")) |
     \   let &swapfile = &modified |
     \ endif
 augroup END
 
-augroup git
-  autocmd!
-  autocmd BufReadPost COMMIT_EDITMSG,TAG_EDITMSG exe "normal! gg"
-  autocmd BufNewFile,BufRead TAG_EDITMSG setlocal ft=gitcommit
-  autocmd BufNewFile,BufRead gitconfig setlocal ft=gitconfig
-  autocmd FileType gitrebase nnoremap <buffer> <silent> S :Cycle<cr>
-augroup END
-
-augroup hlsearch
-  autocmd!
-  autocmd VimEnter * doautocmd User MapCR
-  autocmd CmdWinEnter * nunmap <cr>
-  autocmd CmdWinLeave * doautocmd User MapCR
-  autocmd InsertEnter,InsertLeave * set invhlsearch
-  autocmd User MapCR nnoremap <silent> <cr> :nohlsearch<cr>
-augroup END
-
-augroup paste
-  autocmd!
-  autocmd InsertLeave * set nopaste
-augroup END
-
 augroup windows
-  " Initially, &wmh == 1 and & wh == 1. Setting &wmh > &wh is disallowed,
-  " as is setting 'wmh' after setting 'wh' sufficiently large to prevent
-  " opening another window.
   autocmd!
-  autocmd VimEnter * set wh=5 wmh=5 wh=999 hh=999 cwh=999
-  autocmd VimEnter * set wiw=80
-  autocmd VimEnter * set splitright
-  autocmd VimResized * wincmd =
+  autocmd FilterWritePre * if &diff | set nonumber | endif
+  autocmd VimEnter * nested if &lazyredraw | redrawstatus! | endif
+  autocmd VimResized * nested wincmd =
+  autocmd WinEnter * nested if &buftype != 'quickfix' | resize | set cursorline | endif
+  autocmd WinLeave * set nocursorline
 augroup END
 
 augroup quickfix
   autocmd!
-  autocmd QuickFixCmdPost [^l]* nested cwindow
-  autocmd QuickFixCmdPost l* nested lwindow
+  autocmd QuickFixCmdPost [^l]* nested botright cwindow | wincmd p
+  autocmd QuickFixCmdPost l* nested botright lwindow
+  autocmd VimEnter * nested if filereadable(&errorfile) | botright cwindow | wincmd p | endif
 augroup END
 
-augroup diff
-  autocmd!
-  autocmd FilterWritePre * if &diff | set nonumber | endif
-augroup END
-
-augroup cursorline
-  autocmd!
-  autocmd WinLeave,InsertEnter * set nocursorline
-  autocmd WinEnter,InsertLeave * set cursorline
-augroup END
-
-augroup rails
-  autocmd!
-  autocmd User Rails nnoremap <buffer> <leader>ra :A<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rr :R<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rg :topleft :split Gemfile<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rm :CommandT app/models<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rv :CommandT app/views<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rc :CommandT app/controllers<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rh :CommandT app/helpers<cr>
-  autocmd User Rails nnoremap <buffer> <leader>rl :CommandT lib<cr>
-  autocmd User Rails Rnavcommand factory spec/factories -glob=**/* -suffix=_factory.rb -default=model()
-  autocmd User Rails Rnavcommand feature features -glob=**/* -suffix=.feature
-  autocmd User Rails Rnavcommand steps features/step_definitions spec/steps -glob=**/* -suffix=_steps.rb -default=web
-  autocmd User Rails Rnavcommand support spec/support features/support -default=env
-  autocmd User Rails command! Rroutes e config/routes.rb
-augroup END
-
-map <silent> <leader>T :call RunNearestTest()<cr>
-map <silent> <leader>t :call RunTestFile()<cr>
-map <silent> <leader>a :call RunTests()<cr>
-
-function! InTestFile()
-  if !exists("t:test_regexp")
-    let t:test_regexp = '\v(\.feature|_spec\.rb|_test\.rb|test_.+\.rb)$'
-  endif
-
-  if expand("%") =~# t:test_regexp
-    return 1
-  else
-    return 0
-  endif
-endfunction
-
-function! RunNearestTest()
-  if InTestFile()
-    call RunTestFile(":" . line("."))
-  endif
-endfunction
-
-function! RunTestFile(...)
-  if a:0 == 1
-    let suffix = a:1
-  else
-    let suffix = ""
-  endif
-
-  if InTestFile()
-    call RunTests(expand("%") . suffix)
-  endif
-endfunction
-
-function! RunTests(...)
-  if !InTestFile()
-    return
-  endif
-
-  silent write
-
-  let cmd = "!".&makeprg." "
-
-  if a:0 == 1
-    let cmd .= a:1
-  elseif a:0 == 2
-    let cmd .= a:1.":".a:2
-  endif
-
-  exec cmd
-  redraw!
-endfunction
+silent! source ~/.vimrc.local

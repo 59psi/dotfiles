@@ -1,5 +1,0 @@
-*.tar		diff=tar
-*.t[bg]z	diff=tar
-*.tar.bz2	diff=tar
-*.tar.gz	diff=tar
-*.tar.Z 	diff=tar

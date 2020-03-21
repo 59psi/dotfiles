@@ -1,0 +1,60 @@
+#!/bin/bash
+set -eu
+
+cd "$(git rev-parse --show-toplevel)"
+
+time=$(date +"%Y-%m-%d %H:%M:%S %z")
+manifest=vim/pack/manifest
+
+install_package () {
+  local repo=${1} type=${2:+opt} type=${type:-start}
+  local pkgdir="vim/pack/default/${type}/${repo##*/}"
+
+  if [ ! -d "$pkgdir" ]; then
+    printf "Installing %s\\n" "$repo"
+    git clone --depth 1 "$repo" "$pkgdir"
+  fi
+}
+
+update_package () {
+  local pkgdir=$1
+  printf "Updating %s\\n" "$pkgdir"
+  git -C "$pkgdir" checkout -q master
+  git -C "$pkgdir" pull -q --no-rebase --ff-only
+  git -C "$pkgdir" --no-pager log --graph --decorate --oneline "master@{${time}}.."
+}
+
+find_packages () {
+  find vim/pack/{default,local}/{start,opt} -mindepth 1 -maxdepth 1 -type d "$@" | sort
+}
+
+update () {
+  find_packages | while read -r pkgdir; do
+    update_package "$pkgdir"
+  done
+
+  while read -r repo type; do
+    install_package "$repo" "$type"
+  done < "$manifest"
+}
+
+prune () {
+  find_packages -path 'vim/pack/default/*' | while read -r pkgdir; do
+    repo=$(git -C "$pkgdir" config --get remote.origin.url)
+
+    if ! grep -q -F "$repo" < "$manifest"; then
+      printf "Removing %s\\n" "$pkgdir"
+      rm -r "$pkgdir"
+    fi
+  done
+}
+
+generate_help_tags () {
+  printf "Generating help tags\\n"
+  vim +helptags\ ALL +q
+}
+
+mkdir -p vim/pack/{default,local}/{start,opt}
+update
+prune
+generate_help_tags

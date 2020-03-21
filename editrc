@@ -1,5 +1,16 @@
-edit on
 bind -v
-bind "\t" rl_complete
-bind "^R" em-inc-search-prev
-bind "^S" em-inc-search-next
+bind ^A ed-move-to-beg
+bind ^B ed-prev-char
+bind ^D em-delete-or-list
+bind ^E ed-move-to-end
+bind ^F ed-next-char
+bind ^G vi-command-mode
+bind ^K ed-kill-line
+bind ^L ed-clear-screen
+bind ^N ed-next-history
+bind ^P ed-prev-history
+bind ^R em-inc-search-prev
+bind ^S em-inc-search-next
+
+Ruby:bind ^I rl_complete
+lldb:bind ^I lldb_complete

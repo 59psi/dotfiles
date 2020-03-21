@@ -1,0 +1,182 @@
+# vim:ft=sh
+# shellcheck shell=sh
+
+simplify_path () {
+  # shellcheck disable=SC2039
+  local IFS=: var=$1 dir val
+  for dir in $2; do
+    case ":$val:" in
+      *:"$dir":*) ;;
+      *) [ -d "$dir" ] && val=${val:+$val:}$dir ;;
+    esac
+  done
+  eval "$var=\$val"
+}
+
+PKG_PREFIX=/usr/local
+simplify_path PATH "$HOME/.krew/bin:$HOME/.local/bin:$PKG_PREFIX/bin:$PKG_PREFIX/sbin:$PATH"
+
+[ ! -x /bin/stty ] || stty -ixon
+
+alias du1="du -h -d1"
+alias grep="grep -In --color=auto --exclude-dir=.git --exclude=tags"
+alias egrep="grep -E"
+alias fgrep="grep -F"
+alias lstcp="sudo lsof -Pn -iTCP"
+alias lsudp="sudo lsof -Pn -iUDP"
+alias pb="git for-each-ref refs/heads --format='%(refname:short)' | fzy | xargs git checkout"
+alias pemcp="find ~/.ssh -name '*.pem' | fzy | xargs cat | pbcopy"
+alias rg="rg --line-number --no-heading --hidden"
+alias tree="tree -ACFIa .git --dirsfirst"
+alias vi="vim"
+
+sudo () {
+  case "$1" in
+  vi|vim)
+    echo "use sudoedit or sudo -e" >&2
+    return 1
+    ;;
+  *)
+    command sudo "$@"
+    ;;
+  esac
+}
+
+_inpath () {
+  type "$1" >/dev/null 2>&1
+}
+
+case "$(uname)" in
+  Darwin)
+    _inpath ggrep && alias grep="ggrep -In --color=auto --exclude-dir=.git --exclude=tags"
+    _inpath sudoedit || alias sudoedit="sudo -e"
+
+    alias ls="ls -AFGbh"
+    alias flushdns="sudo -k killall -HUP mDNSResponder"
+    alias resetlaunchpad="defaults write com.apple.dock ResetLaunchPad -bool true && killall Dock"
+    alias resetls="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -v -apps u"
+    alias bu="brew update && brew upgrade && brew cleanup -s -n --prune=0"
+
+    mdopen () {
+      mdfind "$@" | fzy | xargs -I{} open {}
+    }
+
+    export COPYFILE_DISABLE=1
+    export HOMEBREW_NO_ANALYTICS=1
+    export HOMEBREW_NO_AUTO_UPDATE=1
+    export HOMEBREW_NO_EMOJI=1
+    export HOMEBREW_NO_INSTALL_CLEANUP=1
+    ;;
+  Linux)
+    alias ls="ls -AFbh --color=auto"
+    ;;
+esac
+
+packer () {
+  docker run -it --rm \
+    --log-driver none \
+    --name packer \
+    --mount "type=bind,src=$(pwd),dst=/work" \
+    --workdir /work \
+    -e AWS_ACCESS_KEY_ID \
+    -e AWS_SECRET_ACCESS_KEY \
+    -e AWS_SESSION_TOKEN \
+    -e AWS_DEFAULT_REGION \
+    hashicorp/packer:light \
+    "$@"
+}
+
+promtool () {
+  docker run -it --rm \
+    --log-driver none \
+    --name promtool \
+    --mount "type=bind,src=$(pwd),dst=/work,readonly" \
+    --workdir /work \
+    --entrypoint promtool \
+    prom/prometheus:latest \
+    "$@"
+}
+
+amtool () {
+  docker run -it --rm \
+    --log-driver none \
+    --name amtool \
+    --mount "type=bind,src=$(pwd),dst=/work,readonly" \
+    --workdir /work \
+    --entrypoint amtool \
+    prom/alertmanager:latest \
+    "$@"
+}
+
+redis-cli () {
+  docker run -it --rm \
+    --log-driver none \
+    --name redis-cli \
+    jacknagel/redis-cli:latest \
+    "$@"
+}
+
+powershell () {
+  docker run -it --rm \
+    --log-driver none \
+    --name powershell \
+    --mount "type=bind,src=$(pwd),dst=/work,readonly" \
+    --workdir /work \
+    microsoft/powershell:latest \
+    "$@"
+}
+
+skeema () {
+  docker run -it --rm \
+    --log-driver none \
+    --name skeema \
+    --mount "type=bind,src=$(pwd),dst=/work" \
+    --mount "type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock" \
+    --workdir /work \
+    --network host \
+    -e MYSQL_PWD \
+    skeema:latest \
+    "$@"
+}
+
+eksctx () {
+  region=$(aws configure get region)
+  cluster=${1:-dev}
+  aws eks update-kubeconfig --name "$cluster" --alias "${region}/${cluster}"
+}
+
+kctx () {
+  kubectl config get-contexts -o name |
+    fzy --query="${1}" |
+    xargs kubectl config use-context >/dev/null
+}
+
+kns () {
+  kubectl get namespaces -o "custom-columns=NAME:.metadata.name" --no-headers |
+    fzy --query="${1}" |
+    xargs kubectl config set-context --current --namespace >/dev/null
+}
+
+krun () {
+  kubectl run -it --rm \
+    --restart=Never \
+    --image=busybox:1.28 \
+    --overrides '
+{
+  "apiVersion": "v1",
+  "metadata": {
+    "annotations": {
+      "fluentd.org/exclude": "true"
+    }
+  },
+  "spec": {
+    "nodeSelector": {
+      "kubernetes.io/os": "linux",
+      "kubernetes.io/arch": "amd64"
+    }
+  }
+}
+' \
+  "ephemeral-busybox-${USER}" \
+  -- "${@:-sh}"
+}
